@@ -1,0 +1,311 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Sora', sans-serif;
+    background: linear-gradient(135deg, #1b0c2b 0%, #3e2e4e 50%, #241434 100%);
+    background-attachment: fixed;
+    color: #efdbff;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    /* Забороняємо прокрутку всього екрана */
+}
+
+.sidebar {
+    width: 240px;
+    background: rgba(27, 12, 43, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    flex-shrink: 0;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 30px;
+    padding-bottom: 120px;
+    /* Відступ знизу, щоб плеєр не перекривав контент */
+    overflow-y: auto;
+    /* Дозволяємо прокрутку тільки для контенту */
+    height: 100%;
+}
+
+.btn-primary {
+    background: linear-gradient(to right, #ffb0cb, #f4aeff);
+    color: #1b0c2b;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    box-shadow: 0 0 15px rgba(255, 176, 203, 0.3);
+    transition: transform 0.2s;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+}
+
+/* --- ВЕРХНЯ ЧАСТИНА (САЙДБАР) --- */
+.logo h1 {
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.logo p {
+    font-size: 10px;
+    color: #dcbfc7;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 4px;
+}
+
+.menu {
+    list-style: none;
+    margin-top: 40px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: #dcbfc7;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.menu-item.active,
+.menu-item:hover {
+    color: #ffb0cb;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tracks-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.tracks-box h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.tracks-list {
+    list-style: none;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.track-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.track-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.track-details {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.track-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.track-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.track-meta {
+    min-width: 0;
+}
+
+.track-title {
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track-artist {
+    font-size: 11px;
+    color: #dcbfc7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.player-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 30%;
+    min-width: 0;
+}
+
+.player-left img {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.player-info-text {
+    min-width: 0;
+}
+
+.player-info-text h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffb0cb;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.player-info-text p {
+    font-size: 11px;
+    color: #dcbfc7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.player-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 40%;
+}
+
+.player-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.btn-control {
+    background: none;
+    border: none;
+    color: #dcbfc7;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.btn-control:hover {
+    color: #ffb0cb;
+}
+
+.btn-play-pause {
+    background: linear-gradient(to right, #ffb0cb, #f4aeff);
+    color: #1b0c2b;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 24px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    max-width: 350px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.progress-bar-container span {
+    font-size: 10px;
+    color: #dcbfc7;
+    font-family: monospace;
+}
+
+.progress-track {
+    flex-grow: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(to right, #ffb0cb, #f4aeff);
+    border-radius: 2px;
+    width: 0%;
+}
+
+.player-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    width: 30%;
+}
+
+.volume-bar {
+    width: 80px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+.volume-fill {
+    height: 100%;
+    background: #ffb0cb;
+    width: 70%;
+    border-radius: 2px;
+}
