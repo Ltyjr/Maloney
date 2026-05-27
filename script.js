@@ -1,32 +1,35 @@
-        const appName = "Maloney";
-        let apiHost = "https://discoveryprovider.audius.co"; // Резервний хост за замовчуванням
-        let activeTracksList = []; // Масив поточних треків для перемикання (Next/Prev)
+        const appName = "SonicPulseSimplePlayer";
+        let apiHost = "https://discoveryprovider.audius.co"; // Початковий хост
+        let activeTracksList = []; // Свіжий список треків
         let currentTrackIndex = -1; // Індекс поточної пісні
 
-        // DOM Елементи
+        // DOM елементи
         const audio = document.getElementById('audio-player');
         const tracksListContainer = document.getElementById('tracks-list');
         const listTitle = document.getElementById('list-title');
         const searchInput = document.getElementById('search-input');
 
-        // КРОК 1: Автоматично шукаємо працюючий децентралізований сервер
+        // Елементи динамічного банера
+        const heroBanner = document.getElementById('hero-banner');
+        const heroTitle = document.getElementById('hero-title');
+        const heroDesc = document.getElementById('hero-desc');
+
+        // КРОК 1: Автоматичний пошук робочого API сервера
         function initAudius() {
             fetch("https://api.audius.co")
                 .then(response => response.json())
                 .then(result => {
-                    // Якщо список отримано, беремо перший сервер
                     if (result.data && result.data.length > 0) {
                         apiHost = result.data[0];
                     }
-                    // Виводимо ім'я хоста на екран
                     document.getElementById("host-name").innerText = apiHost.replace("https://", "");
                     
-                    // Відразу завантажуємо популярні треки при старті
+                    // Завантажуємо тренди відразу після підключення до сервера
                     loadTopTracks();
                 });
         }
 
-        // КРОК 2: Отримання ТОП популярних треків
+        // КРОК 2: Завантаження ТОП треків з API
         function loadTopTracks() {
             listTitle.innerText = "Популярне зараз 📈";
             let url = apiHost + "/v1/tracks/trending?app_name=" + appName;
@@ -36,10 +39,31 @@
                 .then(result => {
                     activeTracksList = result.data;
                     displayTracks(result.data);
+                    
+                    // ОНОВЛЕННЯ БАНЕРА ДАНІМИ З ТОП-1 ТРЕКУ НА ПЛАТФОРМІ!
+                    updateHeroBanner(result.data);
                 });
         }
 
-        // КРОК 3: Пошук треків за текстом із поля введення
+        // КРОК 3: Функція для динамічного оновлення банера релізу
+        function updateHeroBanner(tracks) {
+            if (tracks && tracks.length > 0) {
+                // Беремо найперший (найпопулярніший трек №1 у світі прямо зараз)
+                let topTrack = tracks[0];
+                let coverUrl = topTrack.artwork ? topTrack.artwork['480x480'] || topTrack.artwork['150x150'] : '';
+
+                // Оновлюємо заголовок та опис банера на реальні дані
+                heroTitle.innerHTML = topTrack.title;
+                heroDesc.innerText = "Найактуальніший хіт на платформі сьогодні від автора " + topTrack.user.name + ". Занурюйтесь у справжнє живе звучання!";
+
+                // Оновлюємо фон банера на реальну обкладинку треку
+                if (coverUrl) {
+                    heroBanner.style.backgroundImage = "linear-gradient(rgba(27, 12, 43, 0.6), rgba(27, 12, 43, 0.95)), url('" + coverUrl + "')";
+                }
+            }
+        }
+
+        // КРОК 4: Пошук музики за текстом
         function searchMusic() {
             let query = searchInput.value.trim();
             if (query === "") return;
@@ -54,14 +78,14 @@
                     displayTracks(result.data);
                 });
         }
-        // потім дописати
-        // Функція для швидкого пошуку та програвання з плиток рекомендацій
+
+        // Швидкий пошук з плиток меню
         function quickPlayKeyword(keyword) {
             searchInput.value = keyword;
             searchMusic();
         }
 
-        // КРОК 4: Виведення списку треків у тег <ul>
+        // КРОК 5: Виведення списку треків у HTML-код сторінки
         function displayTracks(tracks) {
             tracksListContainer.innerHTML = ""; // очищаємо попередній список
 
@@ -77,7 +101,6 @@
                 let li = document.createElement("li");
                 li.className = "track-item";
                 
-                // Рендеримо красивий рядок треку
                 li.innerHTML = `
                     <div class="track-details">
                         <div class="track-pic">
@@ -91,7 +114,6 @@
                     <span class="material-symbols-outlined" style="font-size: 20px; color: #ffb0cb;">play_circle</span>
                 `;
 
-                // Налаштовуємо подію кліку для програвання
                 li.onclick = function() {
                     currentTrackIndex = i;
                     playSong(track);
@@ -101,12 +123,12 @@
             }
         }
 
-        // КРОК 5: Запуск відтворення обраної пісні
+        // КРОК 6: Запуск відтворення обраного треку
         function playSong(track) {
             let streamUrl = apiHost + "/v1/tracks/" + track.id + "/stream?app_name=" + appName;
             let coverUrl = track.artwork ? track.artwork['150x150'] : '';
 
-            // Оновлюємо інформацію в нижній панелі плеєра
+            // Оновлюємо нижній бар програвача
             document.getElementById("player-title").innerText = track.title;
             document.getElementById("player-artist").innerText = track.user.name;
 
@@ -122,16 +144,14 @@
                 coverPlaceholder.style.display = "flex";
             }
 
-            // Передаємо стрім у тег audio
+            // Запускаємо відтворення в audio
             audio.src = streamUrl;
             audio.play();
 
-            // Змінюємо іконку відтворення на паузу
             document.getElementById("play-icon").innerText = "pause";
         }
 
-
-        // Кнопка великого релізу "Слухати зараз" (грає перший трек із списку)
+        // Кнопка на банері "Слухати зараз" (тепер грає саме той трек, що відображений на банері!)
         function playFeaturedSong() {
             if (activeTracksList.length > 0) {
                 currentTrackIndex = 0;
@@ -150,12 +170,12 @@
             }
         }
 
-        // Перемикання треків (Наступний / Попередній)
+        // Наступна/попередня пісня
         function playNext() {
             if (activeTracksList.length === 0) return;
             currentTrackIndex++;
             if (currentTrackIndex >= activeTracksList.length) {
-                currentTrackIndex = 0; // повертаємось на початок
+                currentTrackIndex = 0;
             }
             playSong(activeTracksList[currentTrackIndex]);
         }
@@ -164,30 +184,28 @@
             if (activeTracksList.length === 0) return;
             currentTrackIndex--;
             if (currentTrackIndex < 0) {
-                currentTrackIndex = activeTracksList.length - 1; // в кінець
+                currentTrackIndex = activeTracksList.length - 1;
             }
             playSong(activeTracksList[currentTrackIndex]);
         }
 
-        // Слідкуємо за часом відтворення
+        // Слідкуємо за часом програвання
         audio.addEventListener('timeupdate', function() {
             if (isNaN(audio.duration)) return;
             
-            // Оновлюємо текст часу
             document.getElementById("current-time").innerText = formatSeconds(audio.currentTime);
             document.getElementById("total-time").innerText = formatSeconds(audio.duration);
 
-            // Оновлюємо лінію прогресу
             let pct = (audio.currentTime / audio.duration) * 100;
             document.getElementById("progress-fill").style.width = pct + "%";
         });
 
-        // Автоматично грати наступну пісню при завершенні поточної
+        // Після завершення пісні автоматично вмикаємо наступну
         audio.addEventListener('ended', function() {
             playNext();
         });
 
-        // Перемотка пісні кліком
+        // Перемотка кліком по таймлайну
         function seekAudio(event) {
             if (isNaN(audio.duration)) return;
             let bar = event.currentTarget;
@@ -197,7 +215,7 @@
             audio.currentTime = percentage * audio.duration;
         }
 
-        // Регулювання гучності кліком
+        // Зміна гучності кліком
         function seekVolume(event) {
             let bar = event.currentTarget;
             let clickX = event.clientX - bar.getBoundingClientRect().left;
@@ -210,14 +228,7 @@
             document.getElementById("volume-fill").style.width = (pct * 100) + "%";
         }
 
-        // Переміщення фокуса на поле пошуку
-        function focusSearch() {
-            searchInput.focus();
-            document.getElementById("btn-home").classList.remove("active");
-            document.getElementById("btn-search").classList.add("active");
-        }
-
-        // Перетворення секунд у зручний вигляд хв:сек (0:00)
+        // Зручний переклад секунд у хв:сек
         function formatSeconds(seconds) {
             if (isNaN(seconds)) return "0:00";
             let m = Math.floor(seconds / 60);
@@ -225,7 +236,13 @@
             return m + ":" + s;
         }
 
-        // Копіювання посилання на прямий стрім пісні
+        function focusSearch() {
+            searchInput.focus();
+            document.getElementById("btn-home").classList.remove("active");
+            document.getElementById("btn-search").classList.add("active");
+        }
+
+        // Копіювання посилання на трек
         function copyCurrentLink() {
             if (currentTrackIndex === -1) return;
             let track = activeTracksList[currentTrackIndex];
@@ -238,7 +255,7 @@
             document.execCommand('copy');
             document.body.removeChild(dummy);
 
-            // Показуємо красиве сповіщення замість alert()
+            // Показуємо плавне віконце повідомлення
             let toast = document.getElementById("toast-message");
             toast.style.display = "block";
             setTimeout(function() {
@@ -246,5 +263,5 @@
             }, 2500);
         }
 
-        // Ініціалізуємо підключення до Audius на старті
+        // Старт програми
         initAudius();
