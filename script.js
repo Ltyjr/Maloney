@@ -1,4 +1,4 @@
-        const appName = "SonicPulseSimplePlayer";
+        const appName = "Maloney";
         let apiHost = "https://discoveryprovider.audius.co"; // Початковий хост
         let activeTracksList = []; // Свіжий список треків
         let currentTrackIndex = -1; // Індекс поточної пісні
