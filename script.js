@@ -18,6 +18,26 @@ let currentTrackIndex = -1;
 let likedTracks = JSON.parse(localStorage.getItem('likedTracks')) || [];
 let localTracks = [];
 
+function saveLocalTracks() {
+    localStorage.setItem('localTracksMeta', JSON.stringify(localTracks.map(track => ({
+        title: track.title,
+        artist: track.artist,
+        isLocal: true,
+        src: track.src
+    }))));
+}
+
+function loadLocalTracks() {
+    try {
+        const raw = localStorage.getItem('localTracksMeta');
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return parsed.filter(track => track && track.title).map(track => ({ ...track, src: track.src }));
+    } catch (error) {
+        return [];
+    }
+}
+
 const audio = document.getElementById('audio-player');
 const tracksListContainer = document.getElementById('tracks-list');
 const listTitle = document.getElementById('list-title');
@@ -35,6 +55,9 @@ const genresGrid = document.getElementById('genres-grid');
 
 
 function initAudius() {
+    localTracks = loadLocalTracks();
+    renderLocalTracks();
+
     fetch("https://api.audius.co")
         .then(response => response.json())
         .then(result => {
@@ -76,15 +99,12 @@ function saveLikedTracks() {
     localStorage.setItem('likedTracks', JSON.stringify(likedTracks));
 }
 
-function isTrackLiked(trackId) {
-    return likedTracks.some(track => track.id === trackId);
-}
-
-function toggleLike(track, event) {
     event.stopPropagation();
 
-    if (isTrackLiked(track.id)) {
-        likedTracks = likedTracks.filter(likedTrack => likedTrack.id !== track.id);
+    const trackId = track.id || track.title;
+
+    if (isTrackLiked(trackId)) {
+        likedTracks = likedTracks.filter(likedTrack => (likedTrack.id || likedTrack.title) !== trackId);
     } else {
         likedTracks.unshift(track);
     }
@@ -96,6 +116,10 @@ function toggleLike(track, event) {
     } else {
         displayTracks(activeTracksList);
     }
+}
+
+function isTrackLiked(trackId) {
+    return likedTracks.some(track => (track.id || track.title) === trackId);
 }
 
 function loadTopTracks() {
@@ -215,12 +239,14 @@ function loadTracksFromFolder() {
     const files = localTrackInput.files;
 
     if (files.length === 0) {
-        selectedFilesText.innerText = "Папку ще не обрано";
+        selectedFilesText.innerText = "Файли ще не обрано";
         return;
     }
 
     localTracks.forEach(track => {
-        URL.revokeObjectURL(track.src);
+        if (track.src && track.src.startsWith('blob:')) {
+            URL.revokeObjectURL(track.src);
+        }
     });
 
     localTracks = [];
@@ -232,24 +258,27 @@ function loadTracksFromFolder() {
             || fileName.endsWith(".mp3")
             || fileName.endsWith(".wav")
             || fileName.endsWith(".ogg")
-            || fileName.endsWith(".m4a");
+            || fileName.endsWith(".m4a")
+            || fileName.endsWith(".aac")
+            || fileName.endsWith(".flac");
 
         if (isAudio) {
             localTracks.push({
-                title: file.name,
-                artist: file.webkitRelativePath || "З обраної папки",
+                title: file.name.replace(/\.[^/.]+$/, ''),
+                artist: 'Ви',
                 src: URL.createObjectURL(file),
                 isLocal: true
             });
         }
     }
 
+    saveLocalTracks();
     activeTracksList = localTracks;
     currentTrackIndex = -1;
     renderLocalTracks();
 
     if (localTracks.length === 0) {
-        selectedFilesText.innerText = "У цій папці аудіофайлів не знайдено";
+        selectedFilesText.innerText = "Серед обраних файлів аудіо не знайдено";
     } else {
         selectedFilesText.innerText = "Знайдено треків: " + localTracks.length;
     }
@@ -305,7 +334,7 @@ function escapeHtml(value) {
 function displayTracks(tracks, emptyMessage = "Нічого не знайдено 😢") {
     tracksListContainer.innerHTML = "";
 
-    if (tracks.length === 0) {
+    if (!tracks || tracks.length === 0) {
         tracksListContainer.innerHTML = "<li class='empty-tracks'>" + emptyMessage + "</li>";
         return;
     }
@@ -314,8 +343,9 @@ function displayTracks(tracks, emptyMessage = "Нічого не знайден�
         const track = tracks[i];
         const coverUrl = track.artwork ? track.artwork['150x150'] : '';
         const li = document.createElement("li");
-        const likedClass = isTrackLiked(track.id) ? "liked" : "";
-        const heartIcon = isTrackLiked(track.id) ? "favorite" : "favorite_border";
+        const trackId = track.id || track.title;
+        const likedClass = isTrackLiked(trackId) ? "liked" : "";
+        const heartIcon = isTrackLiked(trackId) ? "favorite" : "favorite_border";
 
         li.className = "track-item";
         li.innerHTML = `
@@ -325,7 +355,7 @@ function displayTracks(tracks, emptyMessage = "Нічого не знайден�
                 </div>
                 <div class="track-meta">
                     <div class="track-title">${escapeHtml(track.title)}</div>
-                    <div class="track-artist">${escapeHtml(track.user.name)}</div>
+                    <div class="track-artist">${escapeHtml(track.user?.name || track.artist || 'Невідомий автор')}</div>
                 </div>
             </div>
             <div class="track-actions">
