@@ -226,6 +226,7 @@ body {
         overflow-y: auto;
         height: auto;
         min-height: 100vh;
+        padding-bottom: 120px;
     }
 
     .sidebar {
@@ -234,6 +235,10 @@ body {
         border-right: none;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         padding: 16px;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        backdrop-filter: blur(24px);
     }
 
     .menu {
@@ -241,6 +246,10 @@ body {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
+    }
+
+    .logo h1 {
+        font-size: 22px;
     }
 
     .menu-item {
@@ -255,6 +264,12 @@ body {
         padding: 16px 16px 170px;
         height: auto;
         overflow-y: visible;
+    }
+
+    .glass-panel,
+    .glass-card,
+    .hero-banner {
+        border-radius: 18px;
     }
 
     .hero-banner {
@@ -316,6 +331,14 @@ body {
 
     .progress-bar-container {
         max-width: none;
+    }
+
+    .player-info-text h4 {
+        font-size: 14px;
+    }
+
+    .player-info-text p {
+        font-size: 12px;
     }
 
     .track-item {
