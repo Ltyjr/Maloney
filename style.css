@@ -12,8 +12,7 @@ body {
     height: 100vh;
     display: flex;
     overflow: hidden;
-    /* Забороняємо прокрутку всього вікна браузера */
-
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* --- СТРУКТУРА СТОРІНКИ (ЛУЙАУТ) --- */
@@ -247,7 +246,9 @@ body {
     .menu-item {
         margin-bottom: 0;
         justify-content: center;
-        padding: 10px 12px;
+        padding: 12px 14px;
+        min-height: 48px;
+        border-radius: 14px;
     }
 
     .main-content {
@@ -263,6 +264,11 @@ body {
 
     .hero-banner h2 {
         font-size: 24px;
+        max-width: 100%;
+    }
+
+    .hero-banner p {
+        max-width: 100%;
     }
 
     .horizontal-grid {
@@ -311,6 +317,15 @@ body {
     .progress-bar-container {
         max-width: none;
     }
+
+    .track-item {
+        padding: 12px;
+    }
+
+    .btn-primary,
+    .file-button {
+        min-height: 48px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -332,13 +347,21 @@ body {
     }
 
     .btn-play-pause {
-        width: 44px;
-        height: 44px;
+        width: 46px;
+        height: 46px;
     }
 
     .btn-like {
-        width: 36px;
-        height: 36px;
+        width: 38px;
+        height: 38px;
+    }
+
+    .track-title {
+        font-size: 14px;
+    }
+
+    .track-artist {
+        font-size: 12px;
     }
 }
 
