@@ -33,6 +33,14 @@
                     <span class="material-symbols-outlined">search</span>
                     <span>Пошук</span>
                 </button>
+                <button onclick="showFavorites()" class="menu-item" id="btn-favorites">
+                    <span class="material-symbols-outlined">favorite</span>
+                    <span>Улюблені</span>
+                </button>
+                <button onclick="showLocalTracks()" class="menu-item" id="btn-local">
+                    <span class="material-symbols-outlined">library_music</span>
+                    <span>Моя музика</span>
+                </button>
             </nav>
         </div>
 
@@ -40,7 +48,6 @@
         <div style="font-size: 10px; color: #dcbfc7; font-family: monospace; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
             <div style="color: #ffb0cb; font-weight: bold; margin-bottom: 4px;">Host:</div>
             <div id="host-name">Пошук сервера...</div>
-        </div>
         </div>
     </aside>
 
@@ -66,19 +73,16 @@
             </div>
             
             <div class="horizontal-grid">
-                <!-- Картка 1 -->
                 <div class="glass-card" onclick="quickPlayKeyword('Neon Nights')">
                     <div class="card-art" style="background-image: url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=300&q=80');"></div>
                     <div class="card-title">Neon Nights</div>
                     <div class="card-desc">DJ Pulse</div>
                 </div>
-                <!-- Картка 2 -->
                 <div class="glass-card" onclick="quickPlayKeyword('Acoustic Soul')">
                     <div class="card-art" style="background-image: url('https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=300&q=80');"></div>
                     <div class="card-title">Acoustic Soul</div>
                     <div class="card-desc">The Echoes</div>
                 </div>
-                <!-- Картка 3 -->
                 <div class="glass-card" onclick="quickPlayKeyword('Festival')">
                     <div class="card-art" style="background-image: url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=300&q=80');"></div>
                     <div class="card-title">Festival Anthems</div>
@@ -87,24 +91,41 @@
             </div>
         </section>
 
-        <!-- Панель з пошуком та списком рекомендацій -->
+        <section class="mobile-stack" style="margin-top: 30px;">
+            <div class="section-title">
+                <h3>Медіатека</h3>
+            </div>
+            <div class="glass-panel">
+                <div class="quick-actions">
+                    <button onclick="triggerUpload()" class="btn-primary">
+                        <span class="material-symbols-outlined">upload_file</span>
+                        Завантажити свою музику
+                    </button>
+                    <input type="file" id="music-upload" accept="audio/*" multiple hidden>
+                </div>
+                <p class="upload-help">Підтримуються MP3, WAV, M4A та інші аудіофайли.</p>
+
+                <div class="subsection-title">Улюблені треки</div>
+                <ul id="favorites-list" class="tracks-list compact-list"></ul>
+
+                <div class="subsection-title">Моя музика</div>
+                <ul id="local-tracks-list" class="tracks-list compact-list"></ul>
+            </div>
+        </section>
+
         <section style="margin-top: 30px;">
             <div class="section-title">
                 <h3>Рекомендовано для вас</h3>
             </div>
             
             <div class="glass-panel">
-                <!-- Рядок пошуку -->
                 <div class="search-area">
                     <input type="text" id="search-input" placeholder="Пошук музики за назвою чи жанром..." onkeydown="if(event.key === 'Enter') searchMusic()">
                     <button onclick="searchMusic()" class="btn-primary" style="padding: 10px 20px;">Шукати</button>
                 </div>
                 
-                <!-- Список знайдених композицій -->
                 <h3 id="list-title" style="font-size: 15px; margin-bottom: 15px; font-weight: 600; color: #ffb0cb;">Завантаження...</h3>
-                <ul id="tracks-list" class="tracks-list">
-                    <!-- Заповнюється автоматично -->
-                </ul>
+                <ul id="tracks-list" class="tracks-list"></ul>
             </div>
         </section>
 
