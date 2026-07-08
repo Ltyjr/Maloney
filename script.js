@@ -99,6 +99,7 @@ function saveLikedTracks() {
     localStorage.setItem('likedTracks', JSON.stringify(likedTracks));
 }
 
+function toggleLike(track, event) {
     event.stopPropagation();
 
     const trackId = track.id || track.title;
